@@ -16,6 +16,7 @@ Adafruit_MQTT_SPARK mqtt(&TheClient,AIO_SERVER,AIO_SERVERPORT,IO_USERNAME,IO_KEY
 // Feeds published to
 // Notice MQTT paths for AIO follow the form: <username>/feeds/<feedname>
 Adafruit_MQTT_Publish humidityFeed = Adafruit_MQTT_Publish(&mqtt, IO_USERNAME "/feeds/garage.humidity");
+Adafruit_MQTT_Publish temperatureFeed = Adafruit_MQTT_Publish(&mqtt, IO_USERNAME "/feeds/garage.temperature");
 
 // Devices
 SI7021 sensor;
@@ -23,9 +24,6 @@ SI7021 sensor;
 // Auto published variables
 double tempC = -100;
 double rH = -1;
-
-// Loop persistent state
-unsigned long lastUpdate = 0;
 
 #if 0
 // Soon to be deleted test code
@@ -61,6 +59,8 @@ void setup()
 
 void loop()
 {
+    static unsigned long lastUpdate = 0;
+
     if(sensor.sensorExists()) {
         si7021_thc r = sensor.getTempAndRH();
         rH = r.humidityPercent / 100.0;
@@ -73,16 +73,25 @@ void loop()
     if(now > lastUpdate + maxRate) {
         lastUpdate = now;
 
+        // Send publishes to particle.io
         // Note - may block for a long time (5 min) if not connected to web
-        String asStr(rH);
-        Particle.publish("newHumidity", asStr.c_str());
+        {
+            String asStr(rH);
+            Particle.publish("newHumidity", asStr.c_str());
+        }
+        {
+            String asStr(tempC);
+            Particle.publish("newTemperature", asStr.c_str());
+        }
 
+        // Send data to adafruit.io
         if(mqtt.Update()) {
             humidityFeed.publish(rH);
+            temperatureFeed.publish(tempC);
         }
     }
 
-    delay(200); // wait 200ms - no need to keep hammering the sensor too often
+    delay(1000); // wait one sec. no need to keep hammering the sensor too often
 }
 
 

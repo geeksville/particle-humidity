@@ -18,6 +18,10 @@ register an account there and download your "AIO key" into a file called
 * If you want to compile your code and deploy it to your device
 "particle flash your_device_name"
 
+## Debugging
+
+* The LED on the photon has some helpful [blink codes](https://docs.particle.io/tutorials/device-os/led/photon/)
+
 ## Notes yet to categorize
 
 use particle board to ifttt
