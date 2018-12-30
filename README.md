@@ -8,8 +8,7 @@ Rather than using the adequate but very basic web IDE, I've opted to build
 locally via their CLI.
 
 Steps required:
-* Install the "particle" binary per [instructions]
-(https://docs.particle.io/tutorials/developer-tools/cli/)
+* Install the "particle" binary per [instructions](https://docs.particle.io/tutorials/developer-tools/cli/)
 * Run "particle setup" to login to your account
 * This project also logs data to the adafruit.io platform, so you'll need to
 register an account there and download your "AIO key" into a file called
