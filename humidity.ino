@@ -1,24 +1,23 @@
-// This #include statement was automatically added by the Particle IDE.
+// We use adadfruit.io for logging/graphing
 #include <Adafruit_MQTT.h>
 #include <Adafruit_MQTT_SPARK.h>
-#include "adafruit_keys.h"
+#include "adafruit_keys.h" // NOTE: This file is not included in git, you must download it from your adafruit.io console "View AIO key"
 
-
-// This #include statement was automatically added by the Particle IDE.
+// The cheap/easy sensor I found on sparkfun
 #include <Particle_SI7021.h>
 
-
-/************************* Adafruit.io Setup *********************************/
+// Adafruit client goo
 #define AIO_SERVER      "io.adafruit.com"
 #define AIO_SERVERPORT  1883                   // use 8883 for SSL
 
 TCPClient TheClient;
 Adafruit_MQTT_SPARK mqtt(&TheClient,AIO_SERVER,AIO_SERVERPORT,IO_USERNAME,IO_KEY);
 
-/****************************** Feeds ***************************************/
+// Feeds published to
 // Notice MQTT paths for AIO follow the form: <username>/feeds/<feedname>
 Adafruit_MQTT_Publish humidityFeed = Adafruit_MQTT_Publish(&mqtt, IO_USERNAME "/feeds/garage.humidity");
 
+// Devices
 SI7021 sensor;
 
 // Auto published variables
@@ -28,31 +27,32 @@ double rH = -1;
 // Loop persistent state
 unsigned long lastUpdate = 0;
 
+#if 0
+// Soon to be deleted test code
+
 int getHumidity(String command) {
     si7021_thc r = sensor.getTempAndRH();
 
     return r.humidityPercent; // r.celsiusHundredths;
 }
 
+// GPIO setup example
+//pinMode(led1, OUTPUT);
+Particle.function("getHumidity", getHumidity); // FIXME - delete after variables confirmed to work
+#endif
+
 // Last time, we only needed to declare pins in the setup function.
 // This time, we are also going to register our Particle function
 
 void setup()
 {
-
-   // Here's the pin configuration, same as last time
-   //pinMode(led1, OUTPUT);
-
-   // We are also going to declare a Particle.function so that we can turn the LED on and off from the cloud.
+   // Test function for particle
    Particle.function("led",ledToggle);
-   // This is saying that when we ask the cloud for the function "led", it will employ the function ledToggle() from this app.
 
-
+   // If our sensor is connected expose our vars
    if(sensor.begin()) {
        Particle.variable("temperature", &tempC, DOUBLE);
        Particle.variable("humidity", &rH, DOUBLE);
-
-       Particle.function("getHumidity", getHumidity); // FIXME - delete after variables confirmed to work
    }
 }
 
@@ -61,36 +61,32 @@ void setup()
 
 void loop()
 {
-    if(0) {
-        if(sensor.sensorExists()) {
-            si7021_thc r = sensor.getTempAndRH();
-            rH = r.humidityPercent / 100.0;
-            tempC = r.celsiusHundredths / 100.0;
-        }
-
-        unsigned long now = Time.now();
-        // int maxRate = 60 * 60; // one hour in seconds
-        int maxRate = 60; // one minute in seconds
-        if(0 && now > lastUpdate + maxRate) {
-            lastUpdate = now;
-
-            // Note - may block for a long time (5 min) if not connected to web
-            String asStr(rH);
-            Particle.publish("newHumidity", asStr.c_str());
-
-            if( mqtt.Update() ){
-                humidityFeed.publish(rH);
-            }
-        }
-
-        delay(200); // wait 200ms - no need to keep hammering the sensor too often
+    if(sensor.sensorExists()) {
+        si7021_thc r = sensor.getTempAndRH();
+        rH = r.humidityPercent / 100.0;
+        tempC = r.celsiusHundredths / 100.0;
     }
+
+    unsigned long now = Time.now();
+    // int maxRate = 60 * 60; // one hour in seconds
+    int maxRate = 60; // one minute in seconds
+    if(now > lastUpdate + maxRate) {
+        lastUpdate = now;
+
+        // Note - may block for a long time (5 min) if not connected to web
+        String asStr(rH);
+        Particle.publish("newHumidity", asStr.c_str());
+
+        if(mqtt.Update()) {
+            humidityFeed.publish(rH);
+        }
+    }
+
+    delay(200); // wait 200ms - no need to keep hammering the sensor too often
 }
 
-// We're going to have a super cool function now that gets called when a matching API request is sent
-// This is the ledToggle function we registered to the "led" Particle.function earlier.
 
-
+// Sample code test function - delete soon
 int ledToggle(String command) {
     /* Particle.functions always take a string as an argument and return an integer.
     Since we can pass a string, it means that we can give the program commands on how the function should be used.
