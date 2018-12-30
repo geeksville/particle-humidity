@@ -1,9 +1,7 @@
 // This #include statement was automatically added by the Particle IDE.
 #include <Adafruit_MQTT.h>
-
-// This #include statement was automatically added by the Particle IDE.
 #include <Adafruit_MQTT_SPARK.h>
-
+#include "adafruit_keys.h"
 
 
 // This #include statement was automatically added by the Particle IDE.
@@ -13,15 +11,13 @@
 /************************* Adafruit.io Setup *********************************/
 #define AIO_SERVER      "io.adafruit.com"
 #define AIO_SERVERPORT  1883                   // use 8883 for SSL
-#define AIO_USERNAME  "punkgeek"
-#define AIO_KEY       "7caed8fad0c84503b9da8fc4e1a9b1a0"
 
 TCPClient TheClient;
-Adafruit_MQTT_SPARK mqtt(&TheClient,AIO_SERVER,AIO_SERVERPORT,AIO_USERNAME,AIO_KEY);
+Adafruit_MQTT_SPARK mqtt(&TheClient,AIO_SERVER,AIO_SERVERPORT,IO_USERNAME,IO_KEY);
 
 /****************************** Feeds ***************************************/
 // Notice MQTT paths for AIO follow the form: <username>/feeds/<feedname>
-Adafruit_MQTT_Publish humidityFeed = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/humidity");
+Adafruit_MQTT_Publish humidityFeed = Adafruit_MQTT_Publish(&mqtt, IO_USERNAME "/feeds/garage.humidity");
 
 SI7021 sensor;
 
