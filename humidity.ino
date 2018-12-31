@@ -6,12 +6,15 @@
 // The cheap/easy sensor I found on sparkfun
 #include <Particle_SI7021.h>
 
+PRODUCT_ID(8583); // humidity product
+PRODUCT_VERSION(1); // increment each time you upload to the console
+
 // Adafruit client goo
 #define AIO_SERVER      "io.adafruit.com"
 #define AIO_SERVERPORT  1883                   // use 8883 for SSL
 
-TCPClient TheClient;
-Adafruit_MQTT_SPARK mqtt(&TheClient,AIO_SERVER,AIO_SERVERPORT,IO_USERNAME,IO_KEY);
+TCPClient adafruitClient;
+Adafruit_MQTT_SPARK mqtt(&adafruitClient,AIO_SERVER,AIO_SERVERPORT,IO_USERNAME,IO_KEY);
 
 // Feeds published to
 // Notice MQTT paths for AIO follow the form: <username>/feeds/<feedname>
