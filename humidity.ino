@@ -3,6 +3,8 @@
 // The cheap/easy sensor I found on sparkfun
 #include <Particle_SI7021.h>
 
+#include "papertrail_config.h"
+
 PRODUCT_ID(8583); // humidity product
 PRODUCT_VERSION(1); // increment each time you upload to the console
 
@@ -19,7 +21,7 @@ double rH = -1;
 int getHumidity(String command) {
 	si7021_thc r = sensor.getTempAndRH();
 
-	return r.humidityPercent;         // r.celsiusHundredths;
+	return r.humidityPercent;                                                             // r.celsiusHundredths;
 }
 
 // GPIO setup example
@@ -32,6 +34,9 @@ Particle.function("getHumidity", getHumidity); // FIXME - delete after variables
 
 void setup()
 {
+	Particle.publish("log", "in setup");
+	Log.info("in setup");
+
 	// Test function for particle
 	Particle.function("led",ledToggle);
 
@@ -57,23 +62,25 @@ void loop()
 
 	unsigned long now = Time.now();
 	// int maxRate = 60 * 60; // one hour in seconds
-	int maxRate = 60;         // one minute in seconds
+	int maxRate = 60;                                                             // one minute in seconds
 	if(now > lastUpdate + maxRate) {
 		lastUpdate = now;
+
+		Log.info("publishing new temps");
 
 		// Send publishes to particle.io
 		// Note - may block for a long time (5 min) if not connected to web
 		{
 			String asStr(rH);
-			Particle.publish("newHumidity", asStr.c_str());
+			Particle.publish("humidity", asStr);
 		}
 		{
 			String asStr(tempC);
-			Particle.publish("newTemperature", asStr.c_str());
+			Particle.publish("temperature", asStr);
 		}
 	}
 
-	delay(1000);         // wait one sec. no need to keep hammering the sensor too often
+	delay(1000);                                                             // wait one sec. no need to keep hammering the sensor too often
 }
 
 
@@ -90,11 +97,11 @@ int ledToggle(String command) {
 	if (command=="on") {
 		// digitalWrite(led1,HIGH);
 		RGB.control(true);
-		RGB.color(255, 0, 0);                 // red
+		RGB.color(255, 0, 0);                                                                                                                         // red
 		return 1;
 	}
 	else if (command=="off") {
-		RGB.color(0, 255, 0);                 // green
+		RGB.color(0, 255, 0);                                                                                                                         // green
 		RGB.control(false);
 		return 0;
 	}
