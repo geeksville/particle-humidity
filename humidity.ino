@@ -69,5 +69,5 @@ void loop()
         }
     }
 
-    delay(1000);                                                                                     // wait one sec. no need to keep hammering the sensor too often
+    delay(10000);                                                                                     // wait ten sec. no need to keep hammering the sensor too often
 }
