@@ -3,7 +3,7 @@
 // The cheap/easy sensor I found on sparkfun
 #include <Particle_SI7021.h>
 
-#include <ParticleWebLog.h>
+#include <lib/ParticleWebLog/src/ParticleWebLog.h>
 
 PRODUCT_ID(8583); // humidity product
 PRODUCT_VERSION(1); // increment each time you upload to the console
@@ -15,7 +15,18 @@ SI7021 sensor;
 double tempC = -100;
 double rH = -1;
 
-ParticleWebLog webLog;
+// I was too sloppy where I soldered on the sensor and it gets warmed by
+// the CPU, so I need this hack.
+double tempCorrect = -7;
+double humidCorrect = .14;
+
+ParticleWebLog webLog("log");
+
+void watchdogTimeout() {
+    System.reset(13);
+}
+
+ApplicationWatchdog watchdog(30000, watchdogTimeout);
 
 // Last time, we only needed to declare pins in the setup function.
 // This time, we are also going to register our Particle function
@@ -24,10 +35,14 @@ void setup()
 {
     Log.info("in setup");
 
+    WiFi.setHostname("particle-humidity"); // For easier reading on dhcp server
+
     // If our sensor is connected expose our vars
     if(sensor.begin()) {
         Particle.variable("temperature", tempC);
         Particle.variable("humidity", rH);
+        Particle.variable("tempCorrect", tempCorrect);
+        Particle.variable("humidCorrect", humidCorrect);
     }
 }
 
@@ -40,8 +55,8 @@ void loop()
 
     if(sensor.sensorExists()) {
         si7021_thc r = sensor.getTempAndRH();
-        rH = r.humidityPercent / 100.0;
-        tempC = r.celsiusHundredths / 100.0;
+        rH = r.humidityPercent / 100.0 + humidCorrect;
+        tempC = r.celsiusHundredths / 100.0 + tempCorrect;
     }
 
     unsigned long now = Time.now();
