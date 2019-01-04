@@ -21,7 +21,7 @@ double rH = -1;
 int getHumidity(String command) {
 	si7021_thc r = sensor.getTempAndRH();
 
-	return r.humidityPercent;                                                             // r.celsiusHundredths;
+	return r.humidityPercent;                                                                 // r.celsiusHundredths;
 }
 
 // GPIO setup example
@@ -62,11 +62,11 @@ void loop()
 
 	unsigned long now = Time.now();
 	// int maxRate = 60 * 60; // one hour in seconds
-	int maxRate = 60;                                                             // one minute in seconds
+	int maxRate = 60;                                                                 // one minute in seconds
 	if(now > lastUpdate + maxRate) {
 		lastUpdate = now;
 
-		Log.info("publishing new temps");
+		Log.info("publishing %d RH, %f degC", (int)( rH * 100), tempC);
 
 		// Send publishes to particle.io
 		// Note - may block for a long time (5 min) if not connected to web
@@ -80,7 +80,7 @@ void loop()
 		}
 	}
 
-	delay(1000);                                                             // wait one sec. no need to keep hammering the sensor too often
+	delay(1000);                                                                 // wait one sec. no need to keep hammering the sensor too often
 }
 
 
@@ -97,11 +97,11 @@ int ledToggle(String command) {
 	if (command=="on") {
 		// digitalWrite(led1,HIGH);
 		RGB.control(true);
-		RGB.color(255, 0, 0);                                                                                                                         // red
+		RGB.color(255, 0, 0);                                                                                                                                 // red
 		return 1;
 	}
 	else if (command=="off") {
-		RGB.color(0, 255, 0);                                                                                                                         // green
+		RGB.color(0, 255, 0);                                                                                                                                 // green
 		RGB.control(false);
 		return 0;
 	}
