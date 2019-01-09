@@ -3,7 +3,7 @@
 // The cheap/easy sensor I found on sparkfun
 #include <Particle_SI7021.h>
 
-#include <lib/ParticleWebLog/src/ParticleWebLog.h>
+#include <ParticleWebLog.h>
 
 PRODUCT_ID(8583); // humidity product
 PRODUCT_VERSION(1); // increment each time you upload to the console
@@ -18,7 +18,7 @@ double rH = -1;
 // I was too sloppy where I soldered on the sensor and it gets warmed by
 // the CPU, so I need this hack.
 double tempCorrect = -7;
-double humidCorrect = .14;
+double humidCorrect = .135;
 
 ParticleWebLog webLog("log");
 
