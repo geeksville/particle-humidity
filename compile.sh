@@ -1,1 +1,1 @@
-particle compile --target 0.8.0-rc.12 photon
+particle compile --target 1.0.0 photon
